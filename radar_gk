@@ -1,0 +1,240 @@
+# -*- coding: utf-8 -*-
+from math import pi
+import matplotlib.pyplot as plt
+import pandas as pd
+
+file_input = "POL_GK_per"
+league_filter = "POL1"
+player = "M. van der Hart"
+
+raw_data = pd.read_csv(file_input +".csv")
+
+legs_played = max(raw_data['played'])
+league = raw_data.loc[raw_data.played > 0.3 * legs_played]
+
+player_list = league.name.unique()
+
+def draw_radar(player):
+    player_data = league.loc[league.name == player].reset_index()
+
+    print(player_data.name.iloc[0])
+
+    position = player_data.iloc[0].position
+    position_data = league.loc[league.position == position].reset_index()
+
+    player_stats = player_data.mean()
+    average_stats = position_data.mean()
+    max_values = position_data.max().replace(to_replace=0, value=0.01)
+
+    to_drop = ["index", "#", "name", "league", "position", "det_pos", "nation", "club", "age",
+               "height", "weight", "foot", "lineup", "sub_out", "sub_in", "InStat", "played"]
+
+    player_stats = player_stats[~player_stats.index.isin(to_drop)]
+    average_stats = average_stats[~average_stats.index.isin(to_drop)]
+    max_values = max_values[~max_values.index.isin(to_drop)]
+
+    radar_player = player_stats.divide(max_values.astype('float64')) * 100
+    radar_average = average_stats.divide(max_values.astype('float64')) * 100
+
+    ##########################################################################################
+
+    pl_minutes = radar_player["minutes"]
+    pl_shots = radar_player["shots"]
+    pl_on_target = radar_player["on_target"]
+    pl_conceded = radar_player["conceded"]
+    pl_saves = radar_player["saves"]
+    pl_saves_p = radar_player["saves_%"]
+    pl_supersave = radar_player["supersave"]
+    pl_intercept = radar_player["intercept"]
+    pl_good_inter = radar_player["good_inter"]
+    pl_intercept_p = radar_player["intercept_%"]
+    pl_passes = radar_player["passes"]
+    pl_passes_w = radar_player["passes_w"]
+    pl_passes_p = radar_player["passes_%"]
+    pl_key_pass = radar_player["key_pass"]
+    pl_key_pass_w = radar_player["key_pass_w"]
+    pl_key_pass_p = radar_player["key_pass_%"]
+    pl_fouls = radar_player["fouls"]
+    pl_open_play = radar_player["open_play"]
+    pl_open_play_p = radar_player["open_play_w"]
+    pl_open_play_p = radar_player["open_play_%"]
+    pl_hand_pass = radar_player["hand_pass"]
+    pl_hand_pass_w = radar_player["hand_pass_w"]
+    pl_hand_pass_p = radar_player["hand_pass_%"]
+    pl_set_piece = radar_player["set_piece"]
+    pl_set_piece_w = radar_player["set_piece_w"]
+    pl_set_piece_p = radar_player["set_piece_%"]
+    pl_short = radar_player["short"]
+    pl_short_w = radar_player["short_w"]
+    pl_short_p = radar_player["short_%"]
+    pl_medium = radar_player["medium"]
+    pl_medium_w = radar_player["medium_w"]
+    pl_medium_p = radar_player["medium_%"]
+    pl_long_ball = radar_player["long_ball"]
+    pl_long_ball_w = radar_player["long_ball_w"]
+    pl_long_ball_p = radar_player["long_ball_%"]
+
+    pl_xG = radar_player["xG"]
+    pl_xG_shot = radar_player["xG_per_shot"]
+    pl_xG_goal = radar_player["xG_per_goal"]
+    pl_xG_save = radar_player["xG_per_save"]
+    pl_Opp_xG = radar_player["Opp_xG"]
+
+    pl_close = radar_player["close"]
+    pl_close_w = radar_player["close_w"]
+    pl_close_p = radar_player["close_%"]
+    pl_mid = radar_player["mid"]
+    pl_mid_w = radar_player["mid_w"]
+    pl_mid_p = radar_player["mid_%"]
+    pl_long = radar_player["long"]
+    pl_long_w = radar_player["long_w"]
+    pl_long_p = radar_player["long_%"]
+    pl_jumps = radar_player["jumps"]
+    pl_no_jumps = radar_player["no_jumps"]
+    pl_clean_sheet = radar_player["clean_sheet"]
+    #pl_pk_save = radar_player["pk_save"]
+    #pl_pk_lost = radar_player["pk_lost"]
+    #pl_pk_p = radar_player["pk_%"]
+    #pl_yellow = radar_player["yellow"]
+    #pl_red = radar_player["red"]
+
+
+
+    avg_minutes = radar_average["minutes"]
+    avg_shots = radar_average["shots"]
+    avg_on_target = radar_average["on_target"]
+    avg_conceded = radar_average["conceded"]
+    avg_saves = radar_average["saves"]
+    avg_saves_p = radar_average["saves_%"]
+    avg_supersave = radar_average["supersave"]
+    avg_intercept = radar_average["intercept"]
+    avg_good_inter = radar_average["good_inter"]
+    avg_intercept_p = radar_average["intercept_%"]
+    avg_passes = radar_average["passes"]
+    avg_passes_w = radar_average["passes_w"]
+    avg_passes_p = radar_average["passes_%"]
+    avg_key_pass = radar_average["key_pass"]
+    avg_key_pass_w = radar_average["key_pass_w"]
+    avg_key_pass_p = radar_average["key_pass_%"]
+    avg_fouls = radar_average["fouls"]
+    avg_open_play = radar_average["open_play"]
+    avg_open_play_p = radar_average["open_play_w"]
+    avg_open_play_p = radar_average["open_play_%"]
+    avg_hand_pass = radar_average["hand_pass"]
+    avg_hand_pass_w = radar_average["hand_pass_w"]
+    avg_hand_pass_p = radar_average["hand_pass_%"]
+    avg_set_piece = radar_average["set_piece"]
+    avg_set_piece_w = radar_average["set_piece_w"]
+    avg_set_piece_p = radar_average["set_piece_%"]
+    avg_short = radar_average["short"]
+    avg_short_w = radar_average["short_w"]
+    avg_short_p = radar_average["short_%"]
+    avg_medium = radar_average["medium"]
+    avg_medium_w = radar_average["medium_w"]
+    avg_medium_p = radar_average["medium_%"]
+    avg_long_ball = radar_average["long_ball"]
+    avg_long_ball_w = radar_average["long_ball_w"]
+    avg_long_ball_p = radar_average["long_ball_%"]
+
+    avg_xG = radar_average["xG"]
+    avg_xG_shot = radar_average["xG_per_shot"]
+    avg_xG_goal = radar_average["xG_per_goal"]
+    avg_xG_save = radar_average["xG_per_save"]
+    avg_Opp_xG = radar_average["Opp_xG"]
+
+    avg_close = radar_average["close"]
+    avg_close_w = radar_average["close_w"]
+    avg_close_p = radar_average["close_%"]
+    avg_mid = radar_average["mid"]
+    avg_mid_w = radar_average["mid_w"]
+    avg_mid_p = radar_average["mid_%"]
+    avg_long = radar_average["long"]
+    avg_long_w = radar_average["long_w"]
+    avg_long_p = radar_average["long_%"]
+    avg_jumps = radar_average["jumps"]
+    avg_no_jumps = radar_average["no_jumps"]
+    avg_clean_sheet = radar_average["clean_sheet"]
+    #avg_pk_save = radar_average["pk_save"]
+    #avg_pk_lost = radar_average["pk_lost"]
+    #avg_pk_p = radar_average["pk_%"]
+    #avg_yellow = radar_average["yellow"]
+    #avg_red = radar_average["red"]
+    
+
+
+    ##########################################################################################
+    """
+    cat = ["'ČISTA MREŽA'", 'OBRANE', 'OBRANE%', 'OBR. BLISKE%', 'OBR. SREDNJE%', 'OBR. IZDALEKA%',
+           'SUPEROBRANE', 'PRESJEČENE', 'DODAVANJA', 'DUGE LOPTE', 'DUGE LOPTE%']
+    """
+    cat = ["CLEAN SHEET", 'SAVES', 'SAVE%', 'CLOSE SAVE%', 'MID SAVE%', 'LONG SAVE%',
+           'SUPERSAVES', 'INTERCEPTIONS', 'PASSES', 'LONG BALLS', 'LONG BALL%']
+    player_radar = [pl_clean_sheet, pl_saves, pl_saves_p, pl_close_p, pl_mid_p, pl_long_p, pl_supersave,
+                    pl_good_inter, pl_passes_w, pl_long_ball_w, pl_long_ball_p]
+    average_radar = [avg_clean_sheet, avg_saves, avg_saves_p, avg_close_p, avg_mid_p, avg_long_p, avg_supersave, 
+                     avg_good_inter, avg_passes_w, avg_long_ball_w, avg_long_ball_p]
+
+    fig, ax = plt.subplots(figsize=(10, 8), facecolor="white")
+
+    N = len(cat)
+
+    x_as = [n / float(N) * 2 * pi for n in range(N)]
+
+    average_radar += average_radar[:1]
+    player_radar += player_radar[:1]
+    x_as += x_as[:1]
+
+
+    plt.rc('axes', linewidth=0.5, edgecolor="#bbbbbb")
+    ax = plt.subplot(polar=True, facecolor="#ffffff")
+
+    ax.set_theta_offset(pi / 2)
+    ax.set_theta_direction(-1)
+    ax.set_rlabel_position(0)
+    ax.xaxis.grid(True, color="#bbbbbb", linestyle='solid', linewidth=0.5)
+    ax.yaxis.grid(True, color="#bbbbbb", linestyle='solid', linewidth=0.5)
+
+    plt.xticks(x_as[:-1], [])
+    plt.yticks([20, 40, 60, 80, 100], ["", "", "", "", ""], color="#555555")
+    plt.ylim(0, 100)
+
+
+    ax.plot(x_as, average_radar, linewidth=2, linestyle='solid', zorder=3)
+    ax.fill(x_as, player_radar, '#77aa00', alpha=0.3)
+
+
+    for i in range(N):
+        angle_rad = i / float(N) * 2 * pi
+
+        if angle_rad == 0:
+            ha, distance_ax = "center", 10
+        elif 0 < angle_rad < pi:
+            ha, distance_ax = "left", 1
+        elif angle_rad == pi:
+            ha, distance_ax = "center", 1
+        else:
+            ha, distance_ax = "right", 1
+
+        ax.text(angle_rad, 106 + distance_ax,
+                cat[i], size=16, horizontalalignment=ha,
+                verticalalignment="center", weight="light")
+
+    SUPTITLE = 'GK, Lech Poznan, POL1 2019/20' 
+
+    ax.set_title(player, fontsize=30, y=1.18, weight="bold")
+    plt.suptitle(SUPTITLE, fontsize=16, y=0.90, x=0.50, color="#777777", weight="light")
+
+    plt.subplots_adjust(left=0.25, right=0.80, top=0.79,
+                        bottom=0.08, hspace=0.20, wspace=0.20)
+
+    player_name = player_data.name.iloc[0]
+
+    # plt.show()
+    plt.close()
+
+    if True:
+        fig.savefig(league_filter + '_GKradar/' + player_data.name.iloc[0] +'.png')
+        
+if True:
+    for i in range(0, len(player_list)):
+        draw_radar(player_list[i])
