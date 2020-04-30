@@ -1,0 +1,354 @@
+# -*- coding: utf-8 -*-
+from math import pi
+import matplotlib.pyplot as plt
+import pandas as pd
+
+
+file_input = "TEAMS"
+league_name = "POL"
+
+data = pd.read_csv(file_input + ".csv")
+# team_list = data.Teams.unique()
+team_list = ["Pogon Szczecin"]
+
+data["% Free-kick shots"] = data["Free-kick attacks with shots"] / data["Free-kick attacks"]
+
+def draw_radar(team):
+    team_data = data.loc[data.Teams == team].reset_index()
+
+    print(team_data.Teams.iloc[0])
+
+    team_stats = team_data.mean()
+    average_stats = data.mean()
+    max_values = data.max().replace(to_replace=0, value=0.01)
+
+    to_drop = ["index", "InStat Index", "Teams"]
+
+    team_stats = team_stats[~team_stats.index.isin(to_drop)]
+    average_stats = average_stats[~average_stats.index.isin(to_drop)]
+    max_values = max_values[~max_values.index.isin(to_drop)]
+
+    radar_team = team_stats.divide(max_values.astype('float64')) * 100
+    radar_average = average_stats.divide(max_values.astype('float64')) * 100
+
+    ##########################################################################################
+
+    STATS_TEAM = True
+    STATS_AVERAGE = True
+
+    if STATS_TEAM:
+        pl_goals = radar_team["Goals"]
+        pl_conceded = radar_team["Conceded"]
+        pl_fouls = radar_team["Fouls"]
+        pl_yellow = radar_team["Yellow cards"]
+        pl_red = radar_team["Red cards"]
+        pl_chances = radar_team["Chances"]
+        pl_chances_w = radar_team["Chances successful"]
+        pl_chances_p = radar_team["Chances, % of conversion"]
+        pl_offside = radar_team["Offsides"]
+        pl_corner = radar_team["Corners"]
+        pl_actions = radar_team["Total actions"]
+        pl_actions_w = radar_team["Successful actions"]
+        pl_actions_p = radar_team["Successful actions, %"]
+        pl_shots = radar_team["Shots"]
+        pl_target = radar_team["Shots on target"]
+        pl_target_p = radar_team["Shots on target, %"]
+        pl_xG = radar_team["xG (Expected goals)"]
+        pl_xG_opp = radar_team["Opponent's xG"]
+        pl_xG_net = radar_team["Net xG (xG - Opponent's xG)"]
+        pl_xG_conv = radar_team["xG conversion"]
+        pl_xG_shot = radar_team["xG per shot"]
+        pl_xG_opp_shot = radar_team["Opponent's xG per shot"]
+        pl_xG_goal = radar_team["xG per goal"]
+        pl_xG_opp_goal = radar_team["Opponent's xG per goal"]
+        pl_passes = radar_team["Passes"]
+        pl_passes_w = radar_team["Accurate passes"]
+        pl_passes_p = radar_team["Accurate passes, %"]
+        pl_key = radar_team["Key passes"]
+        pl_key_w = radar_team["Key passes accurate"]
+        pl_key_p = radar_team["Key passes accuracy, %"]
+        pl_cross = radar_team["Crosses"]
+        pl_cross_w = radar_team["Crosses accurate"]
+        pl_cross_p = radar_team["Accurate crosses, %"]
+        pl_duels = radar_team["Challenges"]
+        pl_duels_w = radar_team["Challenges won"]
+        pl_duels_p = radar_team["Challenges won, %"]
+        pl_df_duel = radar_team["Defensive challenges"]
+        pl_df_duel_w = radar_team["Defensive challenges won"]
+        pl_df_duel_p = radar_team["Challenges in defence won, %"]
+        pl_at_duel = radar_team["Attacking challenges"]
+        pl_at_duel_w = radar_team["Attacking challanges won"]
+        pl_at_duel_p = radar_team["Challenges in attack / won, %"]
+        pl_aerial = radar_team["Air challenges"]
+        pl_aerial_w = radar_team["Air challenges won"]
+        pl_aerial_p = radar_team["Air challenges won, %"]
+        pl_dribble = radar_team["Dribbles"]
+        pl_dribble_w = radar_team["Dribbles successful"]
+        pl_dribble_p = radar_team["Successful dribbles, %"]
+        pl_tackle = radar_team["Tackles"]
+        pl_tackle_w = radar_team["Tackles successful"]
+        pl_tackle_p = radar_team["Tackles won, %"]
+        pl_intercept = radar_team["Ball interceptions"]
+        pl_lost = radar_team["Lost balls"]
+        pl_lost_own = radar_team["Lost balls in own half"]
+        pl_recovery = radar_team["Ball recoveries"]
+        pl_recovery_opp = radar_team["Ball recoveries in opponent's half"]
+        pl_pressing = radar_team["Team pressing"]
+        pl_pressing_w = radar_team["Team pressing successful"]
+        pl_pressing_p = radar_team["Pressing efficiency, %"]
+        pl_PPDA_opp = radar_team["Opponent's passes per defensive action"]
+        pl_possess_min = radar_team["Ball possession, min"]
+        pl_possess_p = radar_team["Ball possession, %"]
+        pl_possess_q = radar_team["Ball possessions, quantity"]
+        pl_possess_avg = radar_team["Possessions' average time"]
+        pl_opp_half = radar_team["Entrances on opponent's half"]
+        pl_final_3rd = radar_team["Entrances on final third of opponent's half"]
+        pl_opp_box = radar_team["Entrances to the  opponent's box"]
+        pl_left_attack = radar_team["Left-side attacks"]
+        pl_left_shot = radar_team["Attacks with shots - left side"]
+        pl_left_p = radar_team["Efficiency for attacks through the left flank, %"]
+        pl_center_attack = radar_team["Attacks - center"]
+        pl_center_shot = radar_team["Attacks with shots - center"]
+        pl_center_p = radar_team["Efficiency for attacks through the central zone, %"]
+        pl_right_attack = radar_team["Attacks - right side"]
+        pl_right_shot = radar_team["Attacks with shots - right side"]
+        pl_right_p = radar_team["Efficiency for attacks through the right flank, %"]
+        pl_position = radar_team["Positional attacks"]
+        pl_position_shot = radar_team["Positional atacks with a shot"]
+        pl_position_p = radar_team["% of efficiency for positional attacks"]
+        pl_counter = radar_team["Counter-attacks"]
+        pl_counter_shot = radar_team["Counter-attacks with a shot"]
+        pl_counter_p = radar_team["% of efficiency for counterattacks"]
+        pl_setpiece = radar_team["Set pieces attacks"]
+        pl_setpiece_shot = radar_team["Attacks with shots - Set pieces attacks"]
+        pl_setpiece_p = radar_team["% of efficiency for set-piece attacks"]
+        pl_freekick = radar_team["Free-kick attacks"]
+        pl_freekick_shots = radar_team["Free-kick attacks with shots"]
+        pl_freekick_p = radar_team["% Free-kick shots"]
+        pl_corner = radar_team["Corner attacks"]
+        pl_corner_shot = radar_team["Corner attacks with shots"]
+        pl_corner_p = radar_team["% of efficiency for corner attacks"]
+        pl_throwin = radar_team["Throw-in attacks"]
+        pl_throwin_shot = radar_team["Throw-in attacks with shots"]
+        pl_throwin_p = radar_team["% of efficiency for throw-in attacks"]
+        pl_freekick_shot = radar_team["Free-kick shots"]
+        pl_freekick_goal = radar_team["Goals - Free-kick attack"]
+        pl_freekick_gl_p = radar_team["% scored free kick shots"]
+        pl_penalty = radar_team["Penalties"]
+        pl_penalty_p = radar_team["Penalties scored, %"]
+      
+            
+    if STATS_AVERAGE:
+        avg_goals = radar_average["Goals"]
+        avg_conceded = radar_average["Conceded"]
+        avg_fouls = radar_average["Fouls"]
+        avg_yellow = radar_average["Yellow cards"]
+        avg_red = radar_average["Red cards"]
+        avg_chances = radar_average["Chances"]
+        avg_chances_w = radar_average["Chances successful"]
+        avg_chances_p = radar_average["Chances, % of conversion"]
+        avg_offside = radar_average["Offsides"]
+        avg_corner = radar_average["Corners"]
+        avg_actions = radar_average["Total actions"]
+        avg_actions_w = radar_average["Successful actions"]
+        avg_actions_p = radar_average["Successful actions, %"]
+        avg_shots = radar_average["Shots"]
+        avg_target = radar_average["Shots on target"]
+        avg_target_p = radar_average["Shots on target, %"]
+        avg_xG = radar_average["xG (Expected goals)"]
+        avg_xG_opp = radar_average["Opponent's xG"]
+        avg_xG_net = radar_average["Net xG (xG - Opponent's xG)"]
+        avg_xG_conv = radar_average["xG conversion"]
+        avg_xG_shot = radar_average["xG per shot"]
+        avg_xG_opp_shot = radar_average["Opponent's xG per shot"]
+        avg_xG_goal = radar_average["xG per goal"]
+        avg_xG_opp_goal = radar_average["Opponent's xG per goal"]
+        avg_passes = radar_average["Passes"]
+        avg_passes_w = radar_average["Accurate passes"]
+        avg_passes_p = radar_average["Accurate passes, %"]
+        avg_key = radar_average["Key passes"]
+        avg_key_w = radar_average["Key passes accurate"]
+        avg_key_p = radar_average["Key passes accuracy, %"]
+        avg_cross = radar_average["Crosses"]
+        avg_cross_w = radar_average["Crosses accurate"]
+        avg_cross_p = radar_average["Accurate crosses, %"]
+        avg_duels = radar_average["Challenges"]
+        avg_duels_w = radar_average["Challenges won"]
+        avg_duels_p = radar_average["Challenges won, %"]
+        avg_df_duel = radar_average["Defensive challenges"]
+        avg_df_duel_w = radar_average["Defensive challenges won"]
+        avg_df_duel_p = radar_average["Challenges in defence won, %"]
+        avg_at_duel = radar_average["Attacking challenges"]
+        avg_at_duel_w = radar_average["Attacking challanges won"]
+        avg_at_duel_p = radar_average["Challenges in attack / won, %"]
+        avg_aerial = radar_average["Air challenges"]
+        avg_aerial_w = radar_average["Air challenges won"]
+        avg_aerial_p = radar_average["Air challenges won, %"]
+        avg_dribble = radar_average["Dribbles"]
+        avg_dribble_w = radar_average["Dribbles successful"]
+        avg_dribble_p = radar_average["Successful dribbles, %"]
+        avg_tackle = radar_average["Tackles"]
+        avg_tackle_w = radar_average["Tackles successful"]
+        avg_tackle_p = radar_average["Tackles won, %"]
+        avg_intercept = radar_average["Ball interceptions"]
+        avg_lost = radar_average["Lost balls"]
+        avg_lost_own = radar_average["Lost balls in own half"]
+        avg_recovery = radar_average["Ball recoveries"]
+        avg_recovery_opp = radar_average["Ball recoveries in opponent's half"]
+        avg_pressing = radar_average["Team pressing"]
+        avg_pressing_w = radar_average["Team pressing successful"]
+        avg_pressing_p = radar_average["Pressing efficiency, %"]
+        avg_PPDA_opp = radar_average["Opponent's passes per defensive action"]
+        avg_possess_min = radar_average["Ball possession, min"]
+        avg_possess_p = radar_average["Ball possession, %"]
+        avg_possess_q = radar_average["Ball possessions, quantity"]
+        avg_possess_avg = radar_average["Possessions' average time"]
+        avg_opp_half = radar_average["Entrances on opponent's half"]
+        avg_final_3rd = radar_average["Entrances on final third of opponent's half"]
+        avg_opp_box = radar_average["Entrances to the  opponent's box"]
+        avg_left_attack = radar_average["Left-side attacks"]
+        avg_left_shot = radar_average["Attacks with shots - left side"]
+        avg_left_p = radar_average["Efficiency for attacks through the left flank, %"]
+        avg_center_attack = radar_average["Attacks - center"]
+        avg_center_shot = radar_average["Attacks with shots - center"]
+        avg_center_p = radar_average["Efficiency for attacks through the central zone, %"]
+        avg_right_attack = radar_average["Attacks - right side"]
+        avg_right_shot = radar_average["Attacks with shots - right side"]
+        avg_right_p = radar_average["Efficiency for attacks through the right flank, %"]
+        avg_position = radar_average["Positional attacks"]
+        avg_position_shot = radar_average["Positional atacks with a shot"]
+        avg_position_p = radar_average["% of efficiency for positional attacks"]
+        avg_counter = radar_average["Counter-attacks"]
+        avg_counter_shot = radar_average["Counter-attacks with a shot"]
+        avg_counter_p = radar_average["% of efficiency for counterattacks"]
+        avg_setpiece = radar_average["Set pieces attacks"]
+        avg_setpiece_shot = radar_average["Attacks with shots - Set pieces attacks"]
+        avg_setpiece_p = radar_average["% of efficiency for set-piece attacks"]
+        avg_freekick = radar_average["Free-kick attacks"]
+        avg_freekick_shots = radar_average["Free-kick attacks with shots"]
+        avg_freekick_p = radar_average["% Free-kick shots"]
+        avg_corner = radar_average["Corner attacks"]
+        avg_corner_shot = radar_average["Corner attacks with shots"]
+        avg_corner_p = radar_average["% of efficiency for corner attacks"]
+        avg_throwin = radar_average["Throw-in attacks"]
+        avg_throwin_shot = radar_average["Throw-in attacks with shots"]
+        avg_throwin_p = radar_average["% of efficiency for throw-in attacks"]
+        avg_freekick_shot = radar_average["Free-kick shots"]
+        avg_freekick_goal = radar_average["Goals - Free-kick attack"]
+        avg_freekick_gl_p = radar_average["% scored free kick shots"]
+        avg_penalty = radar_average["Penalties"]
+        avg_penalty_p = radar_average["Penalties scored, %"]
+        
+    ##########################################################################################
+    language = "EN"
+    phase = "DEFENCE"
+    
+    if language in ["EN"]:
+        if phase in ["ATTACK"]:
+            cat = ['GOALS', 'xG CONVERSION', 'SHOTS', '% ON TARGET', 'OPP. HALF ENTER', 'FINAL 3rd ENTER',
+                   'OPP. BOX ENTER', 'DRIBBLES WON', 'KEY PASSES', 'PASS%', 'PASSES', 'POSSESSION%']
+            player_radar = [pl_goals, pl_xG_conv, pl_shots, pl_target_p, pl_opp_half, pl_final_3rd, 
+                             pl_opp_box, pl_dribble_w, pl_key_w, pl_passes_p, pl_passes, pl_possess_p]
+            average_radar = [avg_goals, avg_xG_conv, avg_shots, avg_target_p, avg_opp_half, avg_final_3rd, 
+                             avg_opp_box, avg_dribble_w, avg_key_w, avg_passes_p, avg_passes, avg_possess_p]
+        
+        elif phase in ["DEFENCE"]:
+            cat = ['DEF. DUELS', 'TACKLES', 'INTERCEPTIONS', 'PRESSINGS', 'PRESSING %', 'OPP. PPDA',
+                   'DEF. DUEL%', 'TACKLE%', 'RECOVERIES', 'COUNTERATT.', 'CONCEDED', 'OPP. xG CONVERSION']
+            player_radar = [pl_df_duel, pl_tackle, pl_intercept, pl_pressing, pl_pressing_p, pl_PPDA_opp,
+                             pl_df_duel_p, pl_tackle_p, pl_recovery, pl_counter, pl_conceded, pl_xG_opp_goal]
+            average_radar = [avg_df_duel, avg_tackle, avg_intercept, avg_pressing, avg_pressing_p, avg_PPDA_opp,
+                             avg_df_duel_p, avg_tackle_p, avg_recovery, avg_counter, avg_conceded, avg_xG_opp_goal]
+            
+        elif phase in ["DUELS"]:
+            cat = ['1', '2', '3', '4', '5', '6',
+                   '7', '8', '9', '10', '11', '12']
+            player_radar = [xx, xx, xx, xx, xx, xx,
+                            xx, xx, xx, xx, xx, xx]
+            average_radar = [xx, xx, xx, xx, xx, xx,
+                             xx, xx, xx, xx, xx, xx]
+            
+        elif phase in ["PASSING"]:
+            cat = ['1', '2', '3', '4', '5', '6',
+                   '7', '8', '9', '10', '11', '12']
+            player_radar = [xx, xx, xx, xx, xx, xx,
+                            xx, xx, xx, xx, xx, xx]
+            average_radar = [xx, xx, xx, xx, xx, xx,
+                             xx, xx, xx, xx, xx, xx]
+            
+        elif phase in ["SET PIECE"]:
+            cat = ['SET PIECES', 'FREE KICK', 'CORNER', 'THROW IN', 
+                   'SET PIECE SHOTS%', 'FREE KICK SHOTS%', 'CORNER SHOTS%', 'THROW IN SHOTS%']
+            player_radar = [pl_setpiece, pl_freekick, pl_corner, pl_throwin,
+                            pl_setpiece_p, pl_freekick_p, pl_corner_p, pl_throwin_p]
+            average_radar = [avg_setpiece, avg_freekick, avg_corner, avg_throwin,
+                             avg_setpiece_p, avg_freekick_p, avg_corner_p, avg_throwin_p]
+            
+        else:
+            print("DEFINE THE PHASE")
+
+    ##########################################################################################
+
+    fig, ax = plt.subplots(figsize=(10, 8), facecolor="white")
+
+    N = len(cat)
+
+    x_as = [n / float(N) * 2 * pi for n in range(N)]
+
+    average_radar += average_radar[:1]
+    player_radar += player_radar[:1]
+    x_as += x_as[:1]
+
+
+    plt.rc('axes', linewidth=0.5, edgecolor="#bbbbbb")
+    ax = plt.subplot(polar=True, facecolor="#ffffff")
+
+    ax.set_theta_offset(pi / 2)
+    ax.set_theta_direction(-1)
+    ax.set_rlabel_position(0)
+    ax.xaxis.grid(True, color="#bbbbbb", linestyle='solid', linewidth=0.5)
+    ax.yaxis.grid(True, color="#bbbbbb", linestyle='solid', linewidth=0.5)
+
+    plt.xticks(x_as[:-1], [])
+    plt.yticks([20, 40, 60, 80, 100], ["", "", "", "", ""], color="#555555")
+    plt.ylim(0, 100)
+
+    print(pl_conceded)
+    print(avg_conceded)
+
+    ax.plot(x_as, average_radar, linewidth=2, linestyle='solid', zorder=3)
+    ax.fill(x_as, player_radar, '#77aa00', alpha=0.3)
+
+    for i in range(N):
+        angle_rad = i / float(N) * 2 * pi
+
+        if angle_rad == 0:
+            ha, distance_ax = "center", 10
+        elif 0 < angle_rad < pi:
+            ha, distance_ax = "left", 1
+        elif angle_rad == pi:
+            ha, distance_ax = "center", 1
+        else:
+            ha, distance_ax = "right", 1
+
+        ax.text(angle_rad, 106 + distance_ax,
+                cat[i], size=16, horizontalalignment=ha,
+                verticalalignment="center", weight="light")
+
+    SUPTITLE = '2019/20 ' + league_name + ' - Phase: ' + phase
+    
+    ax.set_title(team, fontsize=30, y=1.18, weight="bold")
+    plt.suptitle(SUPTITLE, fontsize=16, y=0.90, x=0.50, color="#777777", weight="light")
+
+    plt.subplots_adjust(left=0.20, right=0.80, top=0.79,
+                        bottom=0.08, hspace=0.20, wspace=0.20)
+
+    # plt.show()
+    plt.close()
+
+    if True:
+        fig.savefig(league_name + '_radar/' + team_data.Teams.iloc[0] + ' - ' + phase + '.png')
+        
+if True:
+    for i in range(0, len(team_list)):
+        draw_radar(team_list[i])
