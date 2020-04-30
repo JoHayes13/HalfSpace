@@ -1,0 +1,348 @@
+# -*- coding: utf-8 -*-
+from math import pi
+import matplotlib.pyplot as plt
+import pandas as pd
+
+file_input = "GER"
+league_filter = "GER1"
+
+raw_data = pd.read_csv(file_input + ".csv")
+
+raw_data["goals"] = raw_data["goals"].astype("float64")
+raw_data["assists"] = raw_data["assists"].astype("float64")
+raw_data["goal_assist"] = raw_data.goals + raw_data.assists
+
+league = raw_data.loc[raw_data.league == league_filter]
+
+legs_played = max(league['played'])
+league = league.loc[league.played >= (0.3 * legs_played)]
+club = league.loc[league.club == "Gladbach"]
+
+# player_list = league.name.unique()
+player_list = club.name.unique()
+# player_list = ["S. Eduok"]
+
+def draw_radar(player):
+    player_data = league.loc[league.name == player].reset_index()
+
+    print(player_data.name.iloc[0])
+
+    position = player_data.iloc[0].position
+    position_data = league.loc[league.position == position].reset_index()
+    club = player_data.iloc[0].club
+
+    player_stats = player_data.mean()
+    average_stats = position_data.mean()
+    max_values = position_data.max().replace(to_replace=0, value=0.01)
+
+    to_drop = ["index", "#", "name", "league", "position", "det_pos", "nation", "club", "age",
+               "height", "weight", "foot", "lineup", "sub_out", "sub_in", "InStat", "played"]
+
+    player_stats = player_stats[~player_stats.index.isin(to_drop)]
+    average_stats = average_stats[~average_stats.index.isin(to_drop)]
+    max_values = max_values[~max_values.index.isin(to_drop)]
+
+    radar_player = player_stats.divide(max_values.astype('float64')) * 100
+    radar_average = average_stats.divide(max_values.astype('float64')) * 100
+
+    ##########################################################################################
+
+    STATS_PLAYER = True
+    STATS_AVERAGE = True
+
+    if STATS_PLAYER:
+        pl_xG = radar_player["xG"]
+        pl_minutes = radar_player["minutes"]
+        pl_goals = radar_player["goals"]
+        pl_assists = radar_player["assists"]
+        pl_created = radar_player["created"]
+        pl_chances = radar_player["chance"]
+        pl_chance_w = radar_player["chance_w"]
+        pl_chance_p = radar_player["chance_%"]
+        pl_created = radar_player["created"]
+        pl_fouls = radar_player["fouls"]
+        pl_fouled = radar_player["fouled"]
+        pl_offsides = radar_player["offsides"]
+        pl_yellow = radar_player["yellow"]
+        pl_red = radar_player["red"]
+        pl_actions = radar_player["actions"]
+        pl_actions_w = radar_player["actions_w"]
+        pl_actions_p = radar_player["actions_%"]
+        pl_shots = radar_player["shots"]
+        pl_on_target = radar_player["on_target"]
+        pl_target_p = radar_player["on_target_%"]
+        pl_wide = radar_player["wide"]
+        pl_blocked = radar_player["blocked"]
+        pl_woodwork = radar_player["woodwork"]
+        pl_penalties = radar_player["penalties"]
+        pl_pk_scored = radar_player["pk_scored"]
+        pl_pk_p = radar_player["pk_%"]
+        pl_passes = radar_player["passes"]
+        pl_passes_w = radar_player["passes_w"]
+        pl_passes_p = radar_player["passes_%"]
+        pl_key_pass = radar_player["key_pass"]
+        pl_key_pass_w = radar_player["key_pass_w"]
+        pl_key_pass_p = radar_player["key_pass_%"]
+        pl_cross = radar_player["cross"]
+        pl_cross_w = radar_player["cross_w"]
+        pl_cross_p = radar_player["cross_%"]
+        pl_duel = radar_player["duel"]
+        pl_duel_w = radar_player["duel_w"]
+        pl_duel_p = radar_player["duel_%"]
+        pl_d_duel = radar_player["df_duel"]
+        pl_d_duel_w = radar_player["df_duel_w"]
+        pl_d_duel_p = radar_player["df_duel_%"]
+        pl_a_duel = radar_player["att_duel"]
+        pl_a_duel_w = radar_player["att_duel_w"]
+        pl_a_duel_p = radar_player["att_duel_%"]
+        pl_aerial = radar_player["aerial"]
+        pl_aerial_w = radar_player["aerial_w"]
+        pl_aerial_p = radar_player["aerial_%"]
+        pl_dribbles = radar_player["dribbles"]
+        pl_dribble_w = radar_player["dribble_w"]
+        pl_dribble_p = radar_player["dribble_%"]
+        pl_tackle = radar_player["tackles"]
+        pl_tackle_w = radar_player["tackle_w"]
+        pl_tackle_p = radar_player["tackle_%"]
+        pl_intercept = radar_player["intercept"]
+        pl_pick_ups = radar_player["pick_ups"]
+        pl_lost_ball = radar_player["lost_balls"]
+        pl_lost_OH = radar_player["lost_OH"]
+        pl_recover = radar_player["recover"]
+        pl_recover_OppH = radar_player["recover_OppH"]
+        pl_points = radar_player["goal_assist"]
+    
+    if STATS_AVERAGE:
+        avg_xG = radar_average["xG"]
+        avg_minutes = radar_average["minutes"]
+        avg_goals = radar_average["goals"]
+        avg_assists = radar_average["assists"]
+        avg_created = radar_average["created"]
+        avg_chances = radar_average["chance"]
+        avg_chance_w = radar_average["chance_w"]
+        avg_chance_p = radar_average["chance_%"]
+        avg_created = radar_average["created"]
+        avg_fouls = radar_average["fouls"]
+        avg_fouled = radar_average["fouled"]
+        avg_offsides = radar_average["offsides"]
+        avg_yellow = radar_average["yellow"]
+        avg_red = radar_average["red"]
+        avg_actions = radar_average["actions"]
+        avg_actions_w = radar_average["actions_w"]
+        avg_actions_p = radar_average["actions_%"]
+        avg_shots = radar_average["shots"]
+        avg_on_target = radar_average["on_target"]
+        avg_target_p = radar_average["on_target_%"]
+        avg_wide = radar_average["wide"]
+        avg_blocked = radar_average["blocked"]
+        avg_woodwork = radar_average["woodwork"]
+        avg_penalties = radar_average["penalties"]
+        avg_pk_scored = radar_average["pk_scored"]
+        avg_pk_p = radar_average["pk_%"]
+        avg_passes = radar_average["passes"]
+        avg_passes_w = radar_average["passes_w"]
+        avg_passes_p = radar_average["passes_%"]
+        avg_key_pass = radar_average["key_pass"]
+        avg_key_pass_w = radar_average["key_pass_w"]
+        avg_key_pass_p = radar_average["key_pass_%"]
+        avg_cross = radar_average["cross"]
+        avg_cross_w = radar_average["cross_w"]
+        avg_cross_p = radar_average["cross_%"]
+        avg_duel = radar_average["duel"]
+        avg_duel_w = radar_average["duel_w"]
+        avg_duel_p = radar_average["duel_%"]
+        avg_d_duel = radar_average["df_duel"]
+        avg_d_duel_w = radar_average["df_duel_w"]
+        avg_d_duel_p = radar_average["df_duel_%"]
+        avg_a_duel = radar_average["att_duel"]
+        avg_a_duel_w = radar_average["att_duel_w"]
+        avg_a_duel_p = radar_average["att_duel_%"]
+        avg_aerial = radar_average["aerial"]
+        avg_aerial_w = radar_average["aerial_w"]
+        avg_aerial_p = radar_average["aerial_%"]
+        avg_dribbles = radar_average["dribbles"]
+        avg_dribble_w = radar_average["dribble_w"]
+        avg_dribble_p = radar_average["dribble_%"]
+        avg_tackle = radar_average["tackles"]
+        avg_tackle_w = radar_average["tackle_w"]
+        avg_tackle_p = radar_average["tackle_%"]
+        avg_intercept = radar_average["intercept"]
+        avg_pick_ups = radar_average["pick_ups"]
+        avg_lost_ball = radar_average["lost_balls"]
+        avg_lost_OH = radar_average["lost_OH"]
+        avg_recover = radar_average["recover"]
+        avg_recover_OppH = radar_average["recover_OppH"]
+        avg_points = radar_average["goal_assist"]
+
+    ##########################################################################################
+    language = "EN"
+
+    if language in ["HR"]:
+        if position in ["CD", "CB"]:
+            cat = ['ACTIONS', 'PASSES', 'PASS%', 'DUELS WON', 'AERIAL DUELS WON', 'TACKLES WON', 
+                   'DUEL%', 'DF. DUEL%', 'AERIAL DUEL%', 'TACKLE%', 'INTERCEPTION', 'RECOVERIES']
+            player_radar = [pl_actions_w, pl_passes_w, pl_passes_p, pl_duel_w, pl_aerial_w, pl_tackle_w, 
+                            pl_duel_p, pl_d_duel_p, pl_aerial_p, pl_tackle_p, pl_intercept, pl_recover]
+            average_radar = [avg_actions_w, avg_passes_w, avg_passes_p, avg_duel_w, avg_aerial_w, avg_tackle_w, 
+                            avg_duel_p, avg_d_duel_p, avg_aerial_p, avg_tackle_p, avg_intercept, avg_recover]
+        
+        elif position in ["LD", "LB", "RD", "RB", "FB"]:
+            cat = ['ACTIONS', 'PASSES', 'DUELS WON', 'ATT. DUEL%', 'DF. DUEL%', 'TACKLES WON',
+                   'INTERCEPTION', 'RECOVERIES', 'LOST BALLS', 'DRIBBLES', 'CROSSES', 'KEY PASSES']
+            player_radar = [pl_actions_w, pl_passes_w, pl_duel_w, pl_a_duel_p, pl_d_duel_p, pl_tackle_w,
+                            pl_intercept, pl_recover, pl_lost_ball, pl_dribble_w, pl_cross_w, pl_key_pass_w]
+            average_radar = [avg_actions_w, avg_passes_w, avg_duel_w, avg_a_duel_p, avg_d_duel_p, avg_tackle_w,
+                             avg_intercept, avg_recover, avg_lost_ball, avg_dribble_w, avg_cross_w, avg_key_pass_w]
+        
+        elif position in ["DM", "DMC", "CM", "MC"]:
+            cat = ['PASSES', 'PASS%', 'KEY PASS', 'DRIBBLES', 'ATT. DUEL%', 'DUELS WON',
+                   'TACKLES WON', 'INTERCEPTION', 'AERIAL DUELS WON', 'DF. DUEL%', 'RECOVERIES', 'LOST BALLS']
+            player_radar = [pl_passes_w, pl_passes_p, pl_key_pass_w, pl_dribble_w, pl_a_duel_p, pl_duel_w,
+                            pl_tackle_w, pl_intercept, pl_aerial_w, pl_d_duel_p, pl_recover, pl_lost_ball]
+            average_radar = [avg_passes_w, avg_passes_p, avg_key_pass_w, avg_dribble_w, avg_a_duel_p, avg_duel_w,
+                             avg_tackle_w, avg_intercept, avg_aerial_w, avg_d_duel_p, avg_recover, avg_lost_ball]
+        
+        elif position in ["AM", "AMC"]:
+            cat = ['PASSES', 'KEY PASSES', 'GOAL+AST', 'SHOTS', 'ON TARGET', 'DRIBBLES', 
+                   'DUELS WON', 'ATT. DUEL%', 'DF. DUEL%', 'RECOVERIES', 'LOST BALLS', 'CHANCE CREATED']
+            player_radar = [pl_passes_w, pl_key_pass_w, pl_points, pl_shots, pl_on_target, pl_dribble_w,
+                            pl_duel_w, pl_a_duel_p, pl_d_duel_p, pl_recover, pl_lost_ball, pl_created]
+            average_radar = [avg_passes_w, avg_key_pass_w, avg_points, avg_shots, avg_on_target, avg_dribble_w,
+                             avg_duel_w, avg_a_duel_p, avg_d_duel_p, avg_recover, avg_lost_ball, avg_created]
+        
+        elif position in ["RW", "AMR", "LW", "AML", "WG", "AMC/WG"]:
+            cat = ['PASSES', 'KEY PASSES', 'GOAL+AST', 'xGOALS', 'SHOTS', 'ON TARGET',
+                   'DRIBBLES', 'DRIBBLE%', 'DUEL%', 'FOULED', 'CROSSES', 'CHANCE CREATED']
+            player_radar = [pl_passes_w, pl_key_pass_w, pl_points, pl_xG, pl_shots, pl_on_target,
+                            pl_dribble_w, pl_dribble_p, pl_duel_p, pl_fouled, pl_cross_w, pl_created]
+            average_radar = [avg_passes_w, avg_key_pass_w, avg_points, avg_xG, avg_shots, avg_on_target,
+                             avg_dribble_w, avg_dribble_p, avg_duel_p, avg_fouled, avg_cross_w, avg_created]
+        
+        elif position in ["ST", "CF"]:
+            cat = ['PASSES', 'KEY PASSES', 'GOALS', 'xGOALS', 'SHOTS', 'ON TARGET', 
+                   'FOULED', 'ATT. DUELS WON', 'ATT. DUEL%', 'DRIBBLES', 'AERIAL DUELS WON', 'CHANCE CREATED']
+            player_radar = [pl_passes_w, pl_key_pass_w, pl_goals, pl_shots, pl_on_target, pl_xG,
+                            pl_fouled, pl_a_duel_w, pl_a_duel_p, pl_dribble_w, pl_aerial_w, pl_created]
+            average_radar = [avg_passes_w, avg_key_pass_w, avg_goals, avg_shots, avg_on_target, avg_xG,
+                             avg_fouled, avg_a_duel_w, avg_a_duel_p, avg_dribble_w, avg_aerial_w, avg_created]
+        else:
+            print("ODREDITE POZICIJU IGRAČA")
+
+    if language in ["EN"]:
+        if position in ["CD", "CB"]:
+            cat = ['ACTIONS', 'ACC. PASSES', 'PASS%', 'DUELS WON', 'AERIAL DUELS WON', 'TACKLES WON', 
+                   'DUEL%', 'DF. DUEL%', 'AERIAL DUEL%', 'TACKLE%', 'INTERCEPTION', 'RECOVERIES']
+            player_radar = [pl_actions_w, pl_passes_w, pl_passes_p, pl_duel_w, pl_aerial_w, pl_tackle_w, 
+                            pl_duel_p, pl_d_duel_p, pl_aerial_p, pl_tackle_p, pl_intercept, pl_recover]
+            average_radar = [avg_actions_w, avg_passes_w, avg_passes_p, avg_duel_w, avg_aerial_w, avg_tackle_w, 
+                            avg_duel_p, avg_d_duel_p, avg_aerial_p, avg_tackle_p, avg_intercept, avg_recover]
+        
+        elif position in ["LD", "LB", "RD", "RB", "FB"]:
+            cat = ['ACTIONS', 'ACC. PASSES', 'DUELS WON', 'ATT. DUEL%', 'DF. DUEL%', 'TACKLES WON',
+                   'INTERCEPTION', 'RECOVERIES', 'LOST BALLS', 'DRIBBLES', 'CROSSES', 'KEY PASSES']
+            player_radar = [pl_actions_w, pl_passes_w, pl_duel_w, pl_a_duel_p, pl_d_duel_p, pl_tackle_w,
+                            pl_intercept, pl_recover, pl_lost_ball, pl_dribble_w, pl_cross_w, pl_key_pass_w]
+            average_radar = [avg_actions_w, avg_passes_w, avg_duel_w, avg_a_duel_p, avg_d_duel_p, avg_tackle_w,
+                             avg_intercept, avg_recover, avg_lost_ball, avg_dribble_w, avg_cross_w, avg_key_pass_w]
+        
+        elif position in ["DM", "DMC", "CM", "MC"]:
+            cat = ['ACC. PASSES', 'PASS%', 'KEY PASS', 'DRIBBLES', 'ATT. DUEL%', 'DUELS WON',
+                   'TACKLES WON', 'INTERCEPTION', 'AERIAL DUELS WON', 'DF. DUEL%', 'RECOVERIES', 'LOST BALLS']
+            player_radar = [pl_passes_w, pl_passes_p, pl_key_pass_w, pl_dribble_w, pl_a_duel_p, pl_duel_w,
+                            pl_tackle_w, pl_intercept, pl_aerial_w, pl_d_duel_p, pl_recover, pl_lost_ball]
+            average_radar = [avg_passes_w, avg_passes_p, avg_key_pass_w, avg_dribble_w, avg_a_duel_p, avg_duel_w,
+                             avg_tackle_w, avg_intercept, avg_aerial_w, avg_d_duel_p, avg_recover, avg_lost_ball]
+        
+        elif position in ["AM", "AMC"]:
+            cat = ['ACC. PASSES', 'KEY PASSES', 'GOAL+AST', 'SHOTS', 'ON TARGET', 'DRIBBLES', 
+                   'DUELS WON', 'ATT. DUEL%', 'DF. DUEL%', 'RECOVERIES', 'LOST BALLS', 'CHANCE CREATED']
+            player_radar = [pl_passes_w, pl_key_pass_w, pl_points, pl_shots, pl_on_target, pl_dribble_w,
+                            pl_duel_w, pl_a_duel_p, pl_d_duel_p, pl_recover, pl_lost_ball, pl_created]
+            average_radar = [avg_passes_w, avg_key_pass_w, avg_points, avg_shots, avg_on_target, avg_dribble_w,
+                             avg_duel_w, avg_a_duel_p, avg_d_duel_p, avg_recover, avg_lost_ball, avg_created]
+        
+        elif position in ["RW", "AMR", "LW", "AML", "WG", "AMC/WG"]:
+            cat = ['ACC. PASSES', 'KEY PASSES', 'GOAL+AST', 'xGOALS', 'SHOTS', 'ON TARGET',
+                   'DRIBBLES', 'DRIBBLE%', 'DUEL%', 'FOULED', 'CROSSES', 'CHANCE CREATED']
+            player_radar = [pl_passes_w, pl_key_pass_w, pl_points, pl_xG, pl_shots, pl_on_target,
+                            pl_dribble_w, pl_dribble_p, pl_duel_p, pl_fouled, pl_cross_w, pl_created]
+            average_radar = [avg_passes_w, avg_key_pass_w, avg_points, avg_xG, avg_shots, avg_on_target,
+                             avg_dribble_w, avg_dribble_p, avg_duel_p, avg_fouled, avg_cross_w, avg_created]
+        
+        elif position in ["ST", "CF"]:
+            cat = ['ACC. PASSES', 'KEY PASSES', 'GOALS', 'xGOALS', 'SHOTS', 'ON TARGET', 
+                   'FOULED', 'ATT. DUELS WON', 'ATT. DUEL%', 'DRIBBLES', 'AERIAL DUELS WON', 'CHANCE CREATED']
+            player_radar = [pl_passes_w, pl_key_pass_w, pl_goals, pl_shots, pl_on_target, pl_xG,
+                            pl_fouled, pl_a_duel_w, pl_a_duel_p, pl_dribble_w, pl_aerial_w, pl_created]
+            average_radar = [avg_passes_w, avg_key_pass_w, avg_goals, avg_shots, avg_on_target, avg_xG,
+                             avg_fouled, avg_a_duel_w, avg_a_duel_p, avg_dribble_w, avg_aerial_w, avg_created]
+        else:
+            print("DEFINE PLAYER POSITION")
+
+    ##########################################################################################
+
+    fig, ax = plt.subplots(figsize=(10, 8), facecolor="white")
+
+    N = len(cat)
+
+    x_as = [n / float(N) * 2 * pi for n in range(N)]
+
+    average_radar += average_radar[:1]
+    player_radar += player_radar[:1]
+    x_as += x_as[:1]
+
+
+    plt.rc('axes', linewidth=0.5, edgecolor="#bbbbbb")
+    ax = plt.subplot(polar=True, facecolor="#ffffff")
+
+    ax.set_theta_offset(pi / 2)
+    ax.set_theta_direction(-1)
+    ax.set_rlabel_position(0)
+    ax.xaxis.grid(True, color="#bbbbbb", linestyle='solid', linewidth=0.5)
+    ax.yaxis.grid(True, color="#bbbbbb", linestyle='solid', linewidth=0.5)
+
+    plt.xticks(x_as[:-1], [])
+    plt.yticks([20, 40, 60, 80, 100], ["", "", "", "", ""], color="#555555")
+    plt.ylim(0, 100)
+
+
+    ax.plot(x_as, average_radar, linewidth=2, linestyle='solid', zorder=3)
+    ax.fill(x_as, player_radar, '#77aa00', alpha=0.3)
+
+
+    for i in range(N):
+        angle_rad = i / float(N) * 2 * pi
+
+        if angle_rad == 0:
+            ha, distance_ax = "center", 10
+        elif 0 < angle_rad < pi:
+            ha, distance_ax = "left", 1
+        elif angle_rad == pi:
+            ha, distance_ax = "center", 1
+        else:
+            ha, distance_ax = "right", 1
+
+        ax.text(angle_rad, 106 + distance_ax,
+                cat[i], size=16, horizontalalignment=ha,
+                verticalalignment="center", weight="light")
+
+    if type(club) == str:
+        SUPTITLE = position + ', ' + club + ', 2019/20 ' + league_filter
+    else:
+        SUPTITLE = position + ', Free Agent, 2019/20 ' + league_filter 
+
+    ax.set_title(player, fontsize=30, y=1.18, weight="bold")
+    plt.suptitle(SUPTITLE, fontsize=16, y=0.90, x=0.50, color="#777777", weight="light")
+
+    plt.subplots_adjust(left=0.20, right=0.80, top=0.79,
+                        bottom=0.08, hspace=0.20, wspace=0.20)
+
+    # plt.show()
+    plt.close()
+
+    if True:
+        fig.savefig(league_filter + '_radar/' + player_data.name.iloc[0] +'.png')
+        
+if True:
+    for i in range(0, len(player_list)):
+        draw_radar(player_list[i])
