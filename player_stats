@@ -1,0 +1,123 @@
+import pandas as pd
+
+file_input = "2020"
+league_filter = "ARG1"
+player = "J. Hurtado"
+
+data = pd.read_csv(file_input +".csv")
+#data["name"] = data.first_name + " " + data.last_name
+
+league = data.loc[data.league == league_filter]
+legs_played = max(league['played'])
+
+league = data.loc[data.played >= (0.3 * legs_played)]
+league = league.loc[league.position != 'GK'].reset_index()
+
+player_data = league.loc[league.name == player].reset_index()
+
+position = player_data.iloc[0].position
+position_data = league.loc[league.position == position].reset_index()
+
+club = player_data.iloc[0].club
+club_data = league.loc[league.club == club].reset_index()
+
+if position in ["CD", "CB"]:
+    print(player, '    ', position)
+    print("AKCIJE    : ", player_data.actions_w.iloc[0], '     ', round(position_data.actions_w.mean(), 2))
+    print("DODAVANJA : ", player_data.passes_w.iloc[0], '     ', round(position_data.passes_w.mean(), 2))
+    print("TOČNOST % : ", player_data["passes_%"].iloc[0], '   ', round(position_data["passes_%"].mean(), 2))
+    print("DUELI     : ", player_data.duel_w.iloc[0], '     ', round(position_data.duel_w.mean(), 2))
+    print("ZRAČNI    : ", player_data.aerial_w.iloc[0], '     ', round(position_data.aerial_w.mean(), 2))
+    print("STARTOVI  : ", player_data.tackle_w.iloc[0], '      ', round(position_data.tackle_w.mean(), 2))
+    print("DUELI %   : ", player_data["duel_%"].iloc[0], '   ', round(position_data["duel_%"].mean(), 2))
+    print("DEF DUEL %: ", player_data["df_duel_%"].iloc[0], '   ', round(position_data["df_duel_%"].mean(), 2))
+    print("ZRAČNI %  : ", player_data["aerial_%"].iloc[0], '   ', round(position_data["aerial_%"].mean(), 2))
+    print("STARTOVI %: ", player_data["tackle_%"].iloc[0], '   ', round(position_data["tackle_%"].mean(), 2))
+    print("PRESJEČENE: ", player_data.intercept.iloc[0], '     ', round(position_data.intercept.mean(), 2))
+    print("OSVOJENE  : ", player_data.recover.iloc[0], '     ', round(position_data.recover.mean(), 2))
+
+
+elif position in ["LD", "LB", "RD", "RB"]:
+    print(player, '    ', position)
+    print("AKCIJE    : ", player_data.actions_w.iloc[0], '     ', round(position_data.actions_w.mean(), 2))
+    print("DODAVANJA : ", player_data.passes_w.iloc[0], '     ', round(position_data.passes_w.mean(), 2))
+    print("DUELI     : ", player_data.duel_w.iloc[0], '     ', round(position_data.duel_w.mean(), 2))
+    print("NAP DUEL %: ", player_data["att_duel_%"].iloc[0], '   ', round(position_data["att_duel_%"].mean(), 2))
+    print("DEF DUEL %: ", player_data["df_duel_%"].iloc[0], '   ', round(position_data["df_duel_%"].mean(), 2))
+    print("STARTOVI  : ", player_data.tackle_w.iloc[0], '      ', round(position_data.tackle_w.mean(), 2))
+    print("PRESJEČENE: ", player_data.intercept.iloc[0], '     ', round(position_data.intercept.mean(), 2))
+    print("OSVOJENE  : ", player_data.recover.iloc[0], '     ', round(position_data.recover.mean(), 2))
+    print("IZGUBLJENE: ", player_data.lost_balls.iloc[0], '     ', round(position_data.lost_balls.mean(), 2))
+    print("DRIBLING  : ", player_data.dribble_w.iloc[0], '     ', round(position_data.dribble_w.mean(), 2))
+    print("CENTARŠUT : ", player_data.cross_w.iloc[0], '     ', round(position_data.cross_w.mean(), 2))
+    print("KLJUČNA   : ", player_data.key_pass_w.iloc[0], '     ', round(position_data.key_pass_w.mean(), 2))
+
+
+elif position in ["DM", "DMC", "CM", "MC"]:
+    print(player, '    ', position)
+    print("DODAVANJA : ", player_data.passes_w.iloc[0], '     ', round(position_data.passes_w.mean(), 2))
+    print("TOČNOST % : ", player_data["passes_%"].iloc[0], '   ', round(position_data["passes_%"].mean(), 2))
+    print("KLJUČNA   : ", player_data.key_pass_w.iloc[0], '     ', round(position_data.key_pass_w.mean(), 2))
+    print("DRIBLING  : ", player_data.dribble_w.iloc[0], '     ', round(position_data.dribble_w.mean(), 2))
+    print("NAP DUEL %: ", player_data["att_duel_%"].iloc[0], '   ', round(position_data["att_duel_%"].mean(), 2))
+    print("DUELI     : ", player_data.duel_w.iloc[0], '     ', round(position_data.duel_w.mean(), 2))
+    print("STARTOVI  : ", player_data.tackle_w.iloc[0], '      ', round(position_data.tackle_w.mean(), 2))
+    print("PRESJEČENE: ", player_data.intercept.iloc[0], '     ', round(position_data.intercept.mean(), 2))
+    print("ZRAČNI    : ", player_data.aerial_w.iloc[0], '     ', round(position_data.aerial_w.mean(), 2))
+    print("DEF DUEL %: ", player_data["df_duel_%"].iloc[0], '   ', round(position_data["df_duel_%"].mean(), 2))
+    print("OSVOJENE  : ", player_data.recover.iloc[0], '     ', round(position_data.recover.mean(), 2))
+    print("IZGUBLJENE: ", player_data.lost_balls.iloc[0], '     ', round(position_data.lost_balls.mean(), 2))
+
+
+elif position in ["AM", "AMC"]:
+    print(player, '    ', position)
+    print("DODAVANJA : ", player_data.passes_w.iloc[0], '     ', round(position_data.passes_w.mean(), 2))
+    print("KLJUČNA   : ", player_data.key_pass_w.iloc[0], '     ', round(position_data.key_pass_w.mean(), 2))
+    print("GLS + AST : ", player_data.goals.iloc[0] + player_data.assists.iloc[0], 
+          '     ', round(position_data.goals.mean() + position_data.assists.mean(), 2))
+    print("UDARCI    : ", player_data.shots.iloc[0], '     ', round(position_data.shots.mean(), 2))
+    print("U OKVIR   : ", player_data.on_target.iloc[0], '     ', round(position_data.on_target.mean(), 2))
+    print("DRIBLING  : ", player_data.dribble_w.iloc[0], '     ', round(position_data.dribble_w.mean(), 2))
+    print("DUELI     : ", player_data.duel_w.iloc[0], '     ', round(position_data.duel_w.mean(), 2))
+    print("DEF DUEL %: ", player_data["att_duel_%"].iloc[0], '   ', round(position_data["att_duel_%"].mean(), 2))
+    print("NAP DUEL %: ", player_data["df_duel_%"].iloc[0], '   ', round(position_data["df_duel_%"].mean(), 2))
+    print("OSVOJENE  : ", player_data.recover.iloc[0], '     ', round(position_data.recover.mean(), 2))
+    print("IZGUBLJENE: ", player_data.lost_balls.iloc[0], '     ', round(position_data.lost_balls.mean(), 2))
+    print("KREIRANE  : ", player_data.created.iloc[0], '     ', round(position_data.created.mean(), 2))
+
+
+elif position in ["RW", "AMR", "LW", "AML", "WG"]:
+    print(player, '    ', position)
+    print("DODAVANJA : ", player_data.passes_w.iloc[0], '     ', round(position_data.passes_w.mean(), 2))
+    print("KLJUČNA   : ", player_data.key_pass_w.iloc[0], '     ', round(position_data.key_pass_w.mean(), 2))
+    print("GLS + AST : ", player_data.goals.iloc[0] + player_data.assists.iloc[0], 
+          '     ', round(position_data.goals.mean() + position_data.assists.mean(), 2))
+    print("xGOLOVI   : ", player_data.xG.iloc[0], '     ', round(position_data.xG.mean(), 2))
+    print("UDARCI    : ", player_data.shots.iloc[0], '     ', round(position_data.shots.mean(), 2))
+    print("U OKVIR   : ", player_data.on_target.iloc[0], '     ', round(position_data.on_target.mean(), 2))
+    print("DRIBLING  : ", player_data.dribble_w.iloc[0], '     ', round(position_data.dribble_w.mean(), 2))
+    print("DRIBLING %: ", player_data["dribble_%"].iloc[0], '   ', round(position_data["dribble_%"].mean(), 2))
+    print("DUELI %   : ", player_data["duel_%"].iloc[0], '   ', round(position_data["duel_%"].mean(), 2))
+    print("FAULIRAN  : ", player_data.fouled.iloc[0], '     ', round(position_data.fouled.mean(), 2))
+    print("CENTARŠUT : ", player_data.cross_w.iloc[0], '     ', round(position_data.cross_w.mean(), 2))
+    print("KREIRANE  : ", player_data.created.iloc[0], '     ', round(position_data.created.mean(), 2))
+
+
+elif position in ["ST", "CF"]:
+    print(player, '    ', position)
+    print("DODAVANJA : ", player_data.passes_w.iloc[0], '     ', round(position_data.passes_w.mean(), 2))
+    print("KLJUČNA   : ", player_data.key_pass_w.iloc[0], '     ', round(position_data.key_pass_w.mean(), 2))
+    print("GOLOVI    : ", player_data.goals.iloc[0], '     ', round(position_data.goals.mean(), 2))
+    print("xGOLOVI   : ", player_data.xG.iloc[0], '     ', round(position_data.xG.mean(), 2))
+    print("UDARCI    : ", player_data.shots.iloc[0], '     ', round(position_data.shots.mean(), 2))
+    print("U OKVIR   : ", player_data.on_target.iloc[0], '     ', round(position_data.on_target.mean(), 2))
+    print("FAULIRAN  : ", player_data.fouled.iloc[0], '     ', round(position_data.fouled.mean(), 2))
+    print("DUELI     : ", player_data.duel_w.iloc[0], '     ', round(position_data.duel_w.mean(), 2))
+    print("DUELI %   : ", player_data["duel_%"].iloc[0], '    ', round(position_data["duel_%"].mean(), 2))
+    print("DRIBLING  : ", player_data.dribble_w.iloc[0], '     ', round(position_data.dribble_w.mean(), 2))
+    print("ZRAČNI    : ", player_data.aerial_w.iloc[0], '     ', round(position_data.aerial_w.mean(), 2))
+    print("KREIRANE  : ", player_data.created.iloc[0], '     ', round(position_data.created.mean(), 2))
+
+
+else:
+    print("IGRAČ NEMA POZICIJU")
