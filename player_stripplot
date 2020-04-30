@@ -1,0 +1,114 @@
+# -*- coding: utf-8 -*-
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+file_input = "2020"
+league_filter = "ARG1"
+player = "J. Hurtado"
+
+data = pd.read_csv(file_input +".csv")
+
+league = data.loc[data.league == league_filter]
+legs_played = max(league['played'])
+#league['name'] = league['first_name'] + ' ' + league['last_name']
+
+player_data = league.loc[league.name == player].reset_index()
+player_position = player_data.iloc[0].position
+club = player_data.iloc[0].club
+no_position = 'GK'
+
+league = league.loc[league.played > (legs_played * 0.3)]
+league = league.loc[league.position != no_position]
+
+# DATA FORMATTING
+key = league.loc[league.name == player]
+position = league.loc[(league.position == player_position) & (league.name != player)]
+others = league.loc[(league.position != player_position) & (league.position != no_position) & (league.name != player)]
+
+if player_position in ['CD', 'CB']:
+    STAT_LIST = ['actions', 'actions_%', 'passes', 'passes_%', 'duel', 'duel_%',
+                 'aerial', 'aerial_%', 'tackles', 'tackle_%', 'recover', 'fouls']
+    
+elif player_position in ['RD', 'RB', 'LD', 'LB', 'FB']:
+    STAT_LIST = ['actions', 'actions_%', 'passes', 'passes_%', 'duel', 'duel_%',
+                 'aerial', 'aerial_%', 'tackles', 'tackle_%', 'recover', 'fouls',
+                 'dribbles', 'dribble_w', 'cross', 'cross_w', 'key_pass', 'key_pass_w']
+
+elif player_position in ['DM', 'DMC', 'MC', 'CM']:
+    STAT_LIST = ['actions', 'actions_%', 'passes', 'passes_%', 'duel', 'duel_%',
+                 'aerial', 'aerial_%', 'tackles', 'tackle_%', 'recover', 'lost_balls',
+                 'dribbles', 'dribble_w', 'shots', 'on_target', 'key_pass', 'key_pass_w']
+
+elif player_position in ['RW', 'AMR', 'LW', 'AML', 'AM', 'AMC', 'WG']:
+    STAT_LIST = ['actions', 'actions_%', 'passes', 'passes_%', 'duel', 'duel_%',
+                 'dribbles', 'dribble_w', 'cross', 'cross_w', 'key_pass', 'key_pass_w',
+                 'shots', 'on_target', 'goals', 'assists', 'recover', 'fouled']
+
+else:
+    STAT_LIST = ['actions', 'passes_%', 'goals', 'assists', 'shots', 'on_target',
+                 'key_pass', 'key_pass_w', 'dribbles', 'dribble_w', 'fouled', 'lost_balls', 
+                 'duel', 'duel_%', 'aerial', 'aerial_%', 'recover', 'minutes']
+
+# 'created', 'chance', 'chance_w'  /  'pass_lg', 'pass_lg_w'
+
+def drawing_strip_plots(STAT):
+    fig, ax = plt.subplots(figsize=(10, 10))
+
+    sns.set_style("whitegrid")
+
+    plt.rcParams.update({
+        'font.family': 'serif',
+        'font.serif': 'Ubuntu',
+        'font.monospace': 'Ubuntu Mono',
+        'font.size': 30,
+        'text.color': '#555555',
+    })
+
+    # DRAWING DATA
+    ax = sns.stripplot(y=STAT, data=others, dodge=True, jitter=.25, alpha=0.15,
+                       color="#555555", size=20)
+
+    ax = sns.stripplot(y=STAT, data=position, dodge=True, jitter=.25, alpha=0.4,
+                       color="#08519c", size=25)
+
+    ax = sns.stripplot(y=STAT, data=key, dodge=True, jitter=.0, alpha=0.8,
+                       color="#b30000", size=35)
+
+
+    # FORMATTING AXIS, LABELS, TICKS, GRID...
+    ax.set_ylim()
+    ax.set_xlabel("", color="#555555", fontsize=26)
+    ax.set_ylabel("", color="#555555", fontsize=26)
+    ax.tick_params(axis='both', color='#000000', colors='#555555', length=0, labelsize=20)
+    ax.xaxis.grid(False)
+    ax.yaxis.grid(False)
+    ax.xaxis.set_label_coords(0.5, -0.06)
+    ax.yaxis.set_label_coords(-0.05, 0.5)
+
+
+    TITLE = STAT
+    SUPTITLE = player + ', ' + player_position + ', ' + league_filter
+
+    ax.set_title(TITLE, fontsize=50, y=1.08, weight="bold", color="#000000")
+    plt.suptitle(SUPTITLE, fontsize=20, y=0.86, x=0.51, color="#555555", weight="light")
+
+
+    # MANIPULACIJA 'OKVIROM' GRAFA
+    ax.spines['right'].set_visible(False)
+    ax.spines['top'].set_visible(False)
+    ax.spines['left'].set_visible(False)
+    ax.spines['bottom'].set_visible(False)
+
+
+    # POSTAVLJAMO MARGINE OKO SLIKE
+    plt.subplots_adjust(left=0.10, right=0.92, top=0.82, bottom=0.10, hspace=0.2, wspace=0.2)
+
+    # plt.show()
+    plt.close()
+
+    if True:
+        plt.savefig('player_stripplot/' + STAT + '.png', transparent=True)
+        
+for i in range(0, len(STAT_LIST)):
+    drawing_strip_plots(STAT_LIST[i])
