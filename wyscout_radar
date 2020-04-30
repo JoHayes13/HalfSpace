@@ -1,0 +1,358 @@
+# -*- coding: utf-8 -*-
+from math import pi
+import matplotlib.pyplot as plt
+import pandas as pd
+
+file_input = "VEN"
+
+raw_data = pd.read_excel("/home/jo/Downloads/" + file_input + ".xlsx")
+raw_data["Goal & Assist"] = raw_data["Goals per 90"] + raw_data["Assists per 90"]
+raw_data["xG & xA"] = raw_data["xG per 90"] + raw_data["xA per 90"]
+raw_data['Main position'] = raw_data['Position'].str.split(',').str[0]
+raw_data['Succ. actions'] = raw_data["Succ. att. actions"] + raw_data['Succ. def. per 90']
+raw_data['Gls vs xGls'] = raw_data["Goals per 90"] / raw_data['xG per 90']
+
+legs_played = max(raw_data['Matches played'])
+
+POSITIONS = True
+if POSITIONS:
+    raw_data['Main position'].replace(['RCB', 'LCB', 'RCB3', 'LCB3', 'CB'], 'CD', inplace=True)
+    raw_data['Main position'].replace(['RB', 'RWB', 'RB5'], 'RD', inplace=True)
+    raw_data['Main position'].replace(['LB', 'LWB', 'LB5'], 'LD', inplace=True)
+    raw_data['Main position'].replace(['RDMF', 'LDMF', 'DMF', 'RCMF', 'LCMF', 
+                                       'LCMF3', 'RCMF3'], 'CM', inplace=True)
+    raw_data['Main position'].replace(['RAMF', 'LAMF', 'AMF'], 'AMC', inplace=True)
+    raw_data['Main position'].replace(['RW', 'RWF'], 'AMR', inplace=True)
+    raw_data['Main position'].replace(['LW', 'LWF'], 'AML', inplace=True)
+    
+league = raw_data.loc[raw_data["Matches played"] >= 0.3 * legs_played]
+league = league.loc[league["Main position"] != "GK"]
+
+#test = league.loc[league["Main position"] == "CD"]
+#player_list = league.Player.unique()
+player_list = ["P. Bonilla"]
+
+def draw_radar(player):
+    player_data = league.loc[league.Player == player].reset_index()
+
+    print(player_data.Player.iloc[0])
+
+    position = player_data.iloc[0]["Main position"]
+    position_data = league.loc[(league["Main position"] == position)].reset_index().fillna(0)
+    club = player_data.iloc[0]["Team"]
+
+    player_stats = player_data.sum()
+    average_stats = position_data.mean()
+    max_values = position_data.max().replace(to_replace=0, value=0.01)
+
+
+    to_drop = ["index", "Player", "Team", "Position", "Age", "Market value", "On loan",
+               "Contract expires", "Birth country", "Passport country", "Foot", "Height",
+               "Weight", "Main position"]
+
+    player_stats = player_stats[~player_stats.index.isin(to_drop)]
+    average_stats = average_stats[~average_stats.index.isin(to_drop)]
+    max_values = max_values[~max_values.index.isin(to_drop)]
+
+    radar_player = player_stats.divide(max_values) * 100
+    radar_average = average_stats.divide(max_values) * 100
+
+    ##########################################################################################
+
+    PLAYER_STATS = True
+
+    if PLAYER_STATS:
+        pl_minutes = radar_player["Minutes played"]
+        pl_goals_total = radar_player["Goals"]
+        pl_xG_total = radar_player["xG"]
+        pl_assists_total = radar_player["Assists"]
+        pl_xA_total = radar_player["xA"]
+        pl_points = radar_player["Goal & Assist"]
+        pl_xP = radar_player["xG & xA"]
+        pl_actions = radar_player['Succ. actions']
+        pl_df_actions_w = radar_player["Succ. def. per 90"]
+        pl_df_duel = radar_player["Def duels per 90"]
+        pl_df_duel_p = radar_player["Def duels won %"]
+        pl_aerial = radar_player["Aerial duels per 90"]
+        pl_aerial_p = radar_player["Aerial duels won %"]
+        pl_tackle = radar_player["Tackles per 90"]
+        pl_tackle_opp = radar_player["Tackles per opp.30"]
+        pl_tackle_p = radar_player["Tackle succ. %"]
+        pl_blocked = radar_player["Shots blocked per 90"]
+        pl_intercept = radar_player["Interceptions per 90"]
+        pl_intercept_opp = radar_player["Interceptions per opp.30"]
+        pl_fouls = radar_player["Fouls per 90"]
+        pl_yellow = radar_player["Yellow cards per 90"]
+        pl_red = radar_player["Red cards per 90"]
+        pl_att_actions_w = radar_player["Succ. att. actions"]
+        pl_goals = radar_player["Goals per 90"]
+        pl_no_pk_goals_total = radar_player["Non-penalty goals"]
+        pl_no_pk_goals = radar_player["Non-penalty goals per 90"]
+        pl_xG = radar_player["xG per 90"]
+        pl_head_goals = radar_player["Head goals total"]
+        pl_head_goals_per = radar_player["Head goals per 90"]
+        pl_shots_total = radar_player["Shots total"]
+        pl_shots = radar_player["Shots per 90"]
+        pl_target_p = radar_player["Shots on target %"]
+        pl_conversion = radar_player["Goal conv., %"]
+        pl_assists = radar_player["Assists per 90"]
+        pl_xA = radar_player["xA per 90"]
+        pl_cross = radar_player["Crosses per 90"]
+        pl_cross_p = radar_player["Crosses, %"]
+        pl_cross_left = radar_player["Crosses from left per 90"]
+        pl_cross_left_p = radar_player["Crosses from left, %"]
+        pl_cross_right = radar_player["Crosses from right per 90"]
+        pl_cross_right_p = radar_player["Crosses from right, %"]
+        pl_cross_goalie = radar_player["Crosses to goalie box per 90"]
+        pl_dribbles = radar_player["Dribbles per 90"]
+        pl_dribble_p = radar_player["Dribbles succ. %"]
+        pl_touch_in_box = radar_player["Touches in box per 90"]
+        pl_passes = radar_player["Passes per 90"]
+        pl_passes_p = radar_player["Passes acc. %"]
+        pl_pass_fw = radar_player["Fwd passes per 90"]
+        pl_pass_fw_p = radar_player["Fwd passes acc. %"]
+        pl_pass_back = radar_player["Back passes per 90"]
+        pl_pass_back_p = radar_player["Back passes acc. %"]
+        pl_pass_lat = radar_player["Lat passes per 90"]
+        pl_pass_lat_p = radar_player["Lat passes acc. %"]
+        pl_pass_mid = radar_player["Sh/m passes per 90"]
+        pl_pass_mid_p = radar_player["Sh/m passes acc. %"]
+        pl_pass_lg = radar_player["Lng passes per 90"]
+        pl_pass_lg_p = radar_player["Lng passes acc. %"]
+        pl_pass_length = radar_player["Avg pass length, m"]
+        pl_long_pass_length = radar_player["Avg lng pass length, m"]
+        pl_2nd_ast = radar_player["Second assists per 90"]
+        pl_3rd_ast = radar_player["Third assists per 90"]
+        pl_pass_smt = radar_player["Smt passes per 90"]
+        pl_pass_smt_p = radar_player["Smt passes acc. %"]
+        pl_key_pass = radar_player["Key passes per 90"]
+        pl_final_3rd_pass = radar_player["Final 3rd passes per 90"]
+        pl_final_3rd_pass_p = radar_player["Final 3rd passes acc. %"]
+        pl_penalty_pass = radar_player["Passes to penalty area per 90"]
+        pl_penalty_pass_p = radar_player["Passes to penalty area acc. %"]
+        pl_through_pass = radar_player["Thru passes per 90"]
+        pl_through_pass_p = radar_player["Thru passes acc. %"]
+        pl_deep_pass = radar_player["Deep completed passes per 90"]
+        pl_deep_pass_p = radar_player["Deep completed passes acc. %"]
+        pl_deep_cross = radar_player["Deep completed crosses per 90"]
+        pl_deep_cross_p = radar_player["Deep completed crosses acc. %"]
+        pl_pass_to_gk = radar_player["Back passes to GK per 90"]
+        pl_free_kicks = radar_player["FKs per 90"]
+        pl_direct_fk = radar_player["DFKs per 90"]
+        pl_direct_fk_p = radar_player["DFKs on target %"]
+        pl_corners = radar_player["Corners per 90"]
+        pl_penalties = radar_player["Penalties taken"]
+        pl_penalty_p = radar_player["Penalty conversion %"]
+        pl_gls_xG = radar_player["Gls vs xGls"]
+
+
+        avg_minutes = radar_average["Minutes played"]
+        avg_goals_total = radar_average["Goals"]
+        avg_xG_total = radar_average["xG"]
+        avg_assists_total = radar_average["Assists"]
+        avg_xA_total = radar_average["xA"]
+        avg_points = radar_average["Goal & Assist"]
+        avg_xP = radar_average["xG & xA"]
+        avg_actions = radar_average['Succ. actions']
+        avg_df_actions_w = radar_average["Succ. def. per 90"]
+        avg_df_duel = radar_average["Def duels per 90"]
+        avg_df_duel_p = radar_average["Def duels won %"]
+        avg_aerial = radar_average["Aerial duels per 90"]
+        avg_aerial_p = radar_average["Aerial duels won %"]
+        avg_tackle = radar_average["Tackles per 90"]
+        avg_tackle_opp = radar_average["Tackles per opp.30"]
+        avg_tackle_p = radar_average["Tackle succ. %"]
+        avg_blocked = radar_average["Shots blocked per 90"]
+        avg_intercept = radar_average["Interceptions per 90"]
+        avg_intercept_opp = radar_average["Interceptions per opp.30"]
+        avg_fouls = radar_average["Fouls per 90"]
+        avg_yellow = radar_average["Yellow cards per 90"]
+        avg_red = radar_average["Red cards per 90"]
+        avg_att_actions_w = radar_average["Succ. att. actions"]
+        avg_goals = radar_average["Goals per 90"]
+        avg_no_pk_goals_total = radar_average["Non-penalty goals"]
+        avg_no_pk_goals = radar_average["Non-penalty goals per 90"]
+        avg_xG = radar_average["xG per 90"]
+        avg_head_goals = radar_average["Head goals total"]
+        avg_head_goals_per = radar_average["Head goals per 90"]
+        avg_shots_total = radar_average["Shots total"]
+        avg_shots = radar_average["Shots per 90"]
+        avg_target_p = radar_average["Shots on target %"]
+        avg_conversion = radar_average["Goal conv., %"]
+        avg_assists = radar_average["Assists per 90"]
+        avg_xA = radar_average["xA per 90"]
+        avg_cross = radar_average["Crosses per 90"]
+        avg_cross_p = radar_average["Crosses, %"]
+        avg_cross_left = radar_average["Crosses from left per 90"]
+        avg_cross_left_p = radar_average["Crosses from left, %"]
+        avg_cross_right = radar_average["Crosses from right per 90"]
+        avg_cross_right_p = radar_average["Crosses from right, %"]
+        avg_cross_goalie = radar_average["Crosses to goalie box per 90"]
+        avg_dribbles = radar_average["Dribbles per 90"]
+        avg_dribble_p = radar_average["Dribbles succ. %"]
+        avg_touch_in_box = radar_average["Touches in box per 90"]
+        avg_passes = radar_average["Passes per 90"]
+        avg_passes_p = radar_average["Passes acc. %"]
+        avg_pass_fw = radar_average["Fwd passes per 90"]
+        avg_pass_fw_p = radar_average["Fwd passes acc. %"]
+        avg_pass_back = radar_average["Back passes per 90"]
+        avg_pass_back_p = radar_average["Back passes acc. %"]
+        avg_pass_lat = radar_average["Lat passes per 90"]
+        avg_pass_lat_p = radar_average["Lat passes acc. %"]
+        avg_pass_mid = radar_average["Sh/m passes per 90"]
+        avg_pass_mid_p = radar_average["Sh/m passes acc. %"]
+        avg_pass_lg = radar_average["Lng passes per 90"]
+        avg_pass_lg_p = radar_average["Lng passes acc. %"]
+        avg_pass_length = radar_average["Avg pass length, m"]
+        avg_long_pass_length = radar_average["Avg lng pass length, m"]
+        avg_2nd_ast = radar_average["Second assists per 90"]
+        avg_3rd_ast = radar_average["Third assists per 90"]
+        avg_pass_smt = radar_average["Smt passes per 90"]
+        avg_pass_smt_p = radar_average["Smt passes acc. %"]
+        avg_key_pass = radar_average["Key passes per 90"]
+        avg_final_3rd_pass = radar_average["Final 3rd passes per 90"]
+        avg_final_3rd_pass_p = radar_average["Final 3rd passes acc. %"]
+        avg_penalty_pass = radar_average["Passes to penalty area per 90"]
+        avg_penalty_pass_p = radar_average["Passes to penalty area acc. %"]
+        avg_through_pass = radar_average["Thru passes per 90"]
+        avg_through_pass_p = radar_average["Thru passes acc. %"]
+        avg_deep_pass = radar_average["Deep completed passes per 90"]
+        avg_deep_pass_p = radar_average["Deep completed passes acc. %"]
+        avg_deep_cross = radar_average["Deep completed crosses per 90"]
+        avg_deep_cross_p = radar_average["Deep completed crosses acc. %"]
+        avg_pass_to_gk = radar_average["Back passes to GK per 90"]
+        avg_free_kicks = radar_average["FKs per 90"]
+        avg_direct_fk = radar_average["DFKs per 90"]
+        avg_direct_fk_p = radar_average["DFKs on target %"]
+        avg_corners = radar_average["Corners per 90"]
+        avg_penalties = radar_average["Penalties taken"]
+        avg_penalty_p = radar_average["Penalty conversion %"]
+        avg_gls_xG = radar_average["Gls vs xGls"]
+
+
+    ##########################################################################################
+
+    if position in ["CD"]:
+        cat = ['AKCIJE', 'DODAVANJA', 'TOČNOST', 'DEF. DUELI', 'DEF DUELI%', 'ZRAČNI DUELI',
+               'ZRAČNI DUELI%', 'STARTOVI', 'STARTOVI%', 'PRESJEČENE', 'BLOKIRANE', 'DUGE LOPTE']
+        player_radar = [pl_actions, pl_passes, pl_passes_p, pl_df_duel, pl_df_duel_p, pl_aerial,
+                        pl_aerial_p, pl_tackle, pl_tackle_p, pl_intercept, pl_blocked, pl_pass_lg]
+        average_radar = [avg_actions, avg_passes, avg_passes_p, avg_df_duel, avg_df_duel_p, avg_aerial,
+                        avg_aerial_p, avg_tackle, avg_tackle_p, avg_intercept, avg_blocked, avg_pass_lg]
+
+    elif position in ["LD", "RD"]:
+        cat = ['AKCIJE', 'DODAVANJA', 'DEF. DUELI', 'DEF. DUELI%', 'STARTOVI', 'STARTOVI%', 
+               'ZRAČNI DUELI', 'PRESJEČENE', 'PREKRŠAJI', 'DRIBLINZI', 'CENTARŠUTEVI', 'PAS U ZADNJU TREĆINU']
+        player_radar = [pl_actions, pl_passes, pl_df_duel, pl_df_duel_p, pl_tackle, pl_tackle_p,
+                        pl_aerial, pl_intercept, pl_fouls, pl_dribbles, pl_cross, pl_final_3rd_pass]
+        average_radar = [avg_actions, avg_passes, avg_df_duel, avg_df_duel_p, avg_tackle, avg_tackle_p,
+                         avg_aerial, avg_intercept, avg_fouls, avg_dribbles, avg_cross, avg_final_3rd_pass]
+
+    elif position in ["CM"]:
+        cat = ['DODAVANJA', 'TOČNOST', 'DUGE LOPTE', 'KLJUČNI PAS', 'U ZADNJU 1/3', 'DEF. DUELI',
+               'DEF. DUELI%', 'STARTOVI', 'PRESJEČENE', 'ZRAČNI DUELI', 'DRIBLINZI', 'xGLS + xAST']
+        player_radar = [pl_passes, pl_passes_p, pl_pass_lg, pl_key_pass, pl_final_3rd_pass, pl_df_duel,
+                        pl_df_duel_p, pl_tackle, pl_intercept, pl_aerial, pl_dribbles, pl_xP]
+        average_radar = [avg_passes, avg_passes_p, avg_pass_lg, avg_key_pass, avg_final_3rd_pass, avg_df_duel,
+                        avg_df_duel_p, avg_tackle, avg_intercept, avg_aerial, avg_dribbles, avg_xP]
+
+    elif position in ["AMC"]:
+        cat = ['DODAVANJA', 'PAS U ZADNJU TREĆINU', 'KLJUČNA DOD.', 'GOL + ASIST', 'xGLS + xAST', 'UDARCI',
+               'U OKVIR %', 'DRIBLINZI', 'DRIBLINZI%', 'LOPTA U KAZNENI', 'LOPTA U PROSTOR', 'DEF. AKCIJE']
+        player_radar = [pl_passes, pl_final_3rd_pass, pl_key_pass, pl_points, pl_xP, pl_shots,
+                        pl_target_p, pl_dribbles, pl_dribble_p, pl_penalty_pass, pl_through_pass, pl_df_actions_w]
+        average_radar = [avg_passes, avg_final_3rd_pass, avg_key_pass, avg_points, avg_xP, avg_shots,
+                        avg_target_p, avg_dribbles, avg_dribble_p, avg_penalty_pass, avg_through_pass, avg_df_actions_w]
+
+    elif position in ["AMR", "AML"]:
+        cat = ['DODAVANJA', 'KLJUČNA DODAVANJA', 'GOL + ASIST', 'xGOLOVI', 'xASISTI', 'UDARCI',
+               'U OKVIR %', 'DRIBLINZI', 'DRIBLINZI%', 'LOPTA U KAZNENI P.', 'LOPTA U PROSTOR', 'CENTARŠUTEVI']
+        player_radar = [pl_passes, pl_key_pass, pl_points, pl_xG, pl_xA, pl_shots,
+                        pl_target_p, pl_dribbles, pl_dribble_p, pl_penalty_pass, pl_through_pass, pl_cross]
+        average_radar = [avg_passes, avg_key_pass, avg_points, avg_xG, avg_xA, avg_shots,
+                        avg_target_p, avg_dribbles, avg_dribble_p, avg_penalty_pass, avg_through_pass, avg_cross]
+
+    elif position in ["CF"]:
+        cat = ['DODAVANJA', 'KLJUČNA DODAVANJA', 'GOLOVI (no PK)', 'xGOLOVI', 'UDARCI', 'U OKVIR %',
+               'KONVERZIJA', 'xASIST', 'DRIBLINZI', 'ZRAČNI DUELI', 'DODIRI U 16ercu', 'NAPADAČKE AKCIJE']
+        player_radar = [pl_passes, pl_key_pass, pl_no_pk_goals, pl_xG, pl_shots, pl_target_p,
+                        pl_conversion, pl_xA, pl_dribbles, pl_aerial, pl_touch_in_box, pl_att_actions_w]
+        average_radar = [avg_passes, avg_key_pass, avg_no_pk_goals, avg_xG, avg_shots, avg_target_p,
+                        avg_conversion, avg_xA, avg_dribbles, avg_aerial, avg_touch_in_box, avg_att_actions_w]
+    else:
+        print("ODREDITE POZICIJU IGRAČA")
+
+    ##########################################################################################
+
+    fig, ax = plt.subplots(figsize=(10, 8), facecolor="white")
+
+    N = len(cat)
+
+    x_as = [n / float(N) * 2 * pi for n in range(N)]
+
+    average_radar += average_radar[:1]
+    player_radar += player_radar[:1]
+    x_as += x_as[:1]
+
+
+    plt.rc('axes', linewidth=0.5, edgecolor="#bbbbbb")
+    ax = plt.subplot(polar=True, facecolor="#ffffff")
+
+    ax.set_theta_offset(pi / 2)
+    ax.set_theta_direction(-1)
+    ax.set_rlabel_position(0)
+    ax.xaxis.grid(True, color="#bbbbbb", linestyle='solid', linewidth=0.5, alpha=0.4)
+    ax.yaxis.grid(True, color="#bbbbbb", linestyle='solid', linewidth=0.5, alpha=0.4)
+
+    plt.xticks(x_as[:-1], [])
+    plt.yticks([20, 40, 60, 80, 100], ["", "", "", "", ""], color="#555555")
+    plt.ylim(0, 100)
+
+    BLUE = "#3182bd" 
+    RED = "#e31a1c"
+    GREEN = "#33a02c"
+    YELLOW = "#efd50b"
+    GREY = "#4d4d4d"
+    ORANGE = "#ff7f00"
+    VIOLET = "#6a3d9a"
+
+    ax.plot(x_as, average_radar, linewidth=2, linestyle='solid', zorder=3, color=BLUE)
+    ax.fill(x_as, player_radar, color=BLUE, alpha=0.3)
+
+
+    for i in range(N):
+        angle_rad = i / float(N) * 2 * pi
+
+        if angle_rad == 0:
+            ha, distance_ax = "center", 10
+        elif 0 < angle_rad < pi:
+            ha, distance_ax = "left", 1
+        elif angle_rad == pi:
+            ha, distance_ax = "center", 1
+        else:
+            ha, distance_ax = "right", 1
+
+        ax.text(angle_rad, 106 + distance_ax,
+                cat[i], size=16, horizontalalignment=ha,
+                verticalalignment="center", weight="light")
+
+    if type(club) == str:
+        SUPTITLE = position + ', ' + club + ', 2018/19 ' + file_input
+    else:
+        SUPTITLE = position + ', Free Agent, 2017/18 ' + file_input
+
+    ax.set_title(player, fontsize=30, y=1.18, weight="bold")
+    plt.suptitle(SUPTITLE, fontsize=16, y=0.90, x=0.52, color="#777777", weight="light")
+
+    plt.subplots_adjust(left=0.25, right=0.80, top=0.79,
+                        bottom=0.08, hspace=0.20, wspace=0.20)
+
+    # plt.show()
+    plt.close()
+
+    if True:
+        fig.savefig(file_input + '_radar/' + player_data.iloc[0].Player +'.png')
+        
+if True:
+    for i in range(0, len(player_list)):
+        draw_radar(player_list[i])
