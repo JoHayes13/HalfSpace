@@ -1,0 +1,68 @@
+import pandas as pd
+
+file_input = "2020"
+league_filter = "ARG1"
+player = "Franco Soldano"
+
+raw_data = pd.read_csv(file_input +".csv")
+data = raw_data.loc[raw_data.league == league_filter]
+#data["name"] = data.first_name + " " + data.last_name
+
+player_data = data.loc[data.name == player].reset_index()
+position = player_data.iloc[0].position
+
+if position in ['CD', 'CB']:
+    STAT_LIST = ['actions', 'actions_%', 'passes', 'passes_w', 'passes_%', 'duel',
+                 'duel_w', 'duel_%', 'aerial', 'aerial_w', 'aerial_%', 'tackles',
+                 'tackle_w', 'tackle_%', 'recover', 'fouls']
+    
+elif position in ['RD', 'RB', 'LD', 'LB']:
+    STAT_LIST = ['actions', 'actions_%', 'passes', 'passes_%', 'duel', 'duel_%',
+                 'aerial', 'aerial_%', 'tackles', 'tackle_%', 'recover', 'fouls',
+                 'dribbles', 'dribble_w', 'cross', 'cross_w', 'key_pass', 'key_pass_w']
+
+elif position in ['DM', 'DMC', 'MC', 'CM']:
+    STAT_LIST = ['actions', 'actions_%', 'passes', 'passes_%', 'duel', 'duel_%',
+                 'aerial', 'aerial_%', 'tackles', 'tackle_%', 'recover', 'lost_balls',
+                 'dribbles', 'dribble_w', 'shots', 'on_target', 'key_pass', 'key_pass_w']
+
+elif position in ['RW', 'AMR', 'LW', 'AML', 'AM', 'AMC']:
+    STAT_LIST = ['actions', 'actions_%', 'passes', 'passes_%', 'duel', 'duel_%',
+                 'dribbles', 'dribble_w', 'cross', 'cross_w', 'key_pass', 'key_pass_w',
+                 'shots', 'on_target', 'goals', 'assists', 'recover', 'fouled']
+
+elif position in ['ST', 'CF']:
+    STAT_LIST = ['actions', 'passes_%', 'goals', 'assists', 'shots', 'on_target',
+                 'key_pass', 'key_pass_w', 'dribbles', 'dribble_w', 'fouled', 'lost_balls', 
+                 'duel', 'duel_%', 'aerial', 'aerial_%', 'recover', 'minutes']
+else:
+    print('IGRAČ NEMA POZICIJU')
+    
+def print_rank(data, STAT_LIST, position):
+    data = data.sort_values(by=STAT_LIST[i], ascending=False)
+
+    legs_played = max(data['played'])
+    league = data.loc[data.played > (0.3 * legs_played)]
+    league = league.loc[league.position != 'GK'].reset_index()
+
+    player_data = league.loc[league.name == player].reset_index()
+
+    position_data = league.loc[league.position == position].reset_index()
+
+    club = player_data.iloc[0].club
+    club_data = league.loc[league.club == club].reset_index()
+
+
+    rank_club = club_data.name[club_data.name == player].index.tolist()
+    rank_position = position_data.name[position_data.name == player].index.tolist()
+    rank_league = league.name[league.name == player].index.tolist()
+
+    print(STAT_LIST[i].upper(), '-', player_data.iloc[0][STAT_LIST[i]])
+    print('in club:    ', rank_club[0] + 1, '/', len(club_data))
+    print('in league:  ', rank_league[0] + 1, '/', len(league))
+    print('on position:', rank_position[0] + 1, '/', len(position_data))
+    print('')
+    
+print('\n', player.upper(), '\n')
+for i in range(0, len(STAT_LIST)):
+    print_rank(data, STAT_LIST, position)
